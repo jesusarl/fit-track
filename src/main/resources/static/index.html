@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6.5 6.5h11M6.5 17.5h11M4 12h16"/>
+                        <circle cx="6.5" cy="6.5" r="2.5"/>
+                        <circle cx="17.5" cy="17.5" r="2.5"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>FitTrack</h1>
+                    <p>Tu progreso, en un solo lugar</p>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <button class="nav-btn active" data-panel="dashboard">Inicio</button>
+                <button class="nav-btn" data-panel="user">Nuevo usuario</button>
+                <button class="nav-btn" data-panel="workout">Registrar entreno</button>
+                <button class="nav-btn" data-panel="stats">Estadísticas</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span class="status-dot"></span>
+                API conectada
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Aplicación web</p>
+                    <h2 id="panel-title">Panel principal</h2>
+                </div>
+                <button type="button" class="btn btn-ghost" id="refresh-btn">Actualizar datos</button>
+            </header>
+
+            <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+            <!-- Dashboard -->
+            <section class="panel active" id="panel-dashboard">
+                <div class="hero">
+                    <div>
+                        <h3>Bienvenido a FitTrack</h3>
+                        <p>Registra usuarios, guarda tus entrenamientos y consulta distancia total, tiempo y ritmo promedio calculado automáticamente.</p>
+                    </div>
+                    <div class="hero-actions">
+                        <button type="button" class="btn btn-primary" data-go="workout">Registrar entrenamiento</button>
+                        <button type="button" class="btn btn-secondary" data-go="stats">Ver estadísticas</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid" id="dashboard-stats">
+                    <article class="stat-card">
+                        <span class="stat-label">Usuarios</span>
+                        <strong class="stat-value" id="stat-users">0</strong>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-label">Entrenamientos</span>
+                        <strong class="stat-value" id="stat-workouts">0</strong>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-label">Distancia total</span>
+                        <strong class="stat-value" id="stat-distance">0 km</strong>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-label">Tiempo total</span>
+                        <strong class="stat-value" id="stat-time">0 min</strong>
+                    </article>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Usuarios registrados</h3>
+                    </div>
+                    <div id="users-list" class="users-list empty-state">No hay usuarios todavía. Crea el primero en la sección «Nuevo usuario».</div>
+                </div>
+            </section>
+
+            <!-- Nuevo usuario -->
+            <section class="panel" id="panel-user">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h3>Crear usuario</h3>
+                        <p>Agrega un atleta para asociar sus entrenamientos.</p>
+                    </div>
+                    <form id="user-form" class="form-grid">
+                        <label>
+                            Nombre
+                            <input type="text" name="nombre" required placeholder="Ej. María López" autocomplete="name">
+                        </label>
+                        <label>
+                            Email
+                            <input type="email" name="email" required placeholder="maria@email.com" autocomplete="email">
+                        </label>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Guardar usuario</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Registrar entrenamiento -->
+            <section class="panel" id="panel-workout">
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h3>Registrar entrenamiento</h3>
+                        <p>El ritmo promedio (min/km) se calcula automáticamente al guardar.</p>
+                    </div>
+                    <form id="workout-form" class="form-grid">
+                        <label>
+                            Usuario
+                            <select name="usuarioId" id="workout-user-select" required>
+                                <option value="">Selecciona un usuario</option>
+                            </select>
+                        </label>
+                        <label>
+                            Tipo de ejercicio
+                            <select name="tipoEjercicio" required>
+                                <option value="RUNNING">Running</option>
+                                <option value="CYCLING">Ciclismo</option>
+                            </select>
+                        </label>
+                        <label>
+                            Distancia (km)
+                            <input type="number" name="distanciaKm" required min="0.1" step="0.1" placeholder="5.0">
+                        </label>
+                        <label>
+                            Tiempo (minutos)
+                            <input type="number" name="tiempoMinutos" required min="1" step="1" placeholder="30">
+                        </label>
+                        <label>
+                            Fecha
+                            <input type="date" name="fecha" required>
+                        </label>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Guardar entrenamiento</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Estadísticas -->
+            <section class="panel" id="panel-stats">
+                <div class="card">
+                    <div class="card-header row-between">
+                        <div>
+                            <h3>Estadísticas por usuario</h3>
+                            <p>Distancia acumulada, tiempo total y historial de entrenamientos.</p>
+                        </div>
+                        <label class="inline-select">
+                            Usuario
+                            <select id="stats-user-select">
+                                <option value="">Selecciona un usuario</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div id="stats-empty" class="empty-state">Selecciona un usuario para ver sus estadísticas.</div>
+
+                    <div id="stats-content" class="hidden">
+                        <div class="stats-grid compact">
+                            <article class="stat-card accent">
+                                <span class="stat-label">Distancia total</span>
+                                <strong class="stat-value" id="user-distance">0 km</strong>
+                            </article>
+                            <article class="stat-card accent">
+                                <span class="stat-label">Tiempo total</span>
+                                <strong class="stat-value" id="user-time">0 min</strong>
+                            </article>
+                            <article class="stat-card accent">
+                                <span class="stat-label">Entrenamientos</span>
+                                <strong class="stat-value" id="user-workouts-count">0</strong>
+                            </article>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Distancia</th>
+                                        <th>Tiempo</th>
+                                        <th>Ritmo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="workouts-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
