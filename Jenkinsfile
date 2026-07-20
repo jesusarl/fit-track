@@ -40,8 +40,22 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo "Placeholder Deploy: imagen ${IMAGE_NAME}:${IMAGE_TAG} lista localmente."
-                echo 'Siguiente paso del proyecto: Terraform (AWS) + push a registry + despliegue en EC2.'
+                script {
+                    // Dispara un nuevo deploy en Render solo si existe la credencial.
+                    // ID esperado: render-deploy-hook (Secret text con la URL del Deploy Hook).
+                    try {
+                        withCredentials([string(credentialsId: 'render-deploy-hook', variable: 'RENDER_DEPLOY_HOOK')]) {
+                            echo "Disparando deploy en Render (build ${IMAGE_TAG})..."
+                            sh 'curl -fsS -X POST "$RENDER_DEPLOY_HOOK"'
+                            echo 'Deploy a Render solicitado correctamente.'
+                        }
+                    } catch (err) {
+                        echo "Omitiendo Deploy a Render: no hay credencial 'render-deploy-hook' o falló el hook."
+                        echo 'Pasos: Render → Service → Settings → Deploy Hook → copiar URL.'
+                        echo 'Luego en Jenkins: Manage Jenkins → Credentials → Add → Secret text (ID: render-deploy-hook).'
+                        echo "Detalle: ${err}"
+                    }
+                }
             }
         }
     }
