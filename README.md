@@ -11,8 +11,7 @@ Aplicación de seguimiento de entrenamientos (running / ciclismo) con API REST, 
 | UI | HTML / CSS / JS (servida por Spring) |
 | Contenedores | Docker, Docker Compose |
 | CI | Jenkins (`Jenkinsfile`) |
-| Cloud | Render (`render.yaml`) |
-| IaC (opcional) | Terraform para AWS en `/terraform` |
+| Cloud / IaC | Render (`render.yaml`) |
 
 ## Requisitos
 
@@ -124,7 +123,7 @@ git push → (≤ ~2 min) Jenkins detecta cambios → Test → Build Image → D
 Objetivo: que solo se redeploye en Render **después** de que pasen los tests.
 
 1. En **Render** → tu servicio web (`fittrack-app`) → **Settings** → **Deploy Hook** → Create → copia la URL.  
-2. (Recomendado) En Render desactiva **Auto-Deploy** del servicio, para no desplegar dos veces (una por GitHub y otra por Jenkins).  
+2. En Render desactiva **Auto-Deploy** del servicio (obligatorio en este proyecto), para que solo despliegue Jenkins tras pasar los tests.  
 3. En **Jenkins** → **Manage Jenkins** → **Credentials** → **Add Credentials**:
    - Kind: **Secret text**
    - Secret: la URL del Deploy Hook
@@ -147,10 +146,6 @@ Notas del plan free:
 - La web puede “dormirse” tras inactividad; el primer request tarda más.  
 - La base free caduca a los ~30 días (útil para demos del curso).
 
-## Terraform (AWS, opcional)
-
-Hay una base en [`/terraform`](terraform/) (VPC, EC2, RDS). Requiere cuenta AWS, CLI y Terraform. Si no puedes usar AWS, el camino soportado del equipo es **Render**.
-
 ## Estructura del repo
 
 ```
@@ -162,7 +157,6 @@ fit-track/
 ├── Dockerfile
 ├── Jenkinsfile
 ├── render.yaml
-├── terraform/
 └── scripts/                # up / down / test / jenkins-*
 ```
 
@@ -182,7 +176,8 @@ Copia `.env.example` a `.env` para personalizar puertos locales.
 
 ```text
 Push a GitHub
-    → Jenkins: Test + Build Image
+    → Jenkins (pollSCM) detecta el cambio
+    → Test + Build Image
     → Deploy Hook → Render redespliega
     → App disponible en la URL de Render
 ```

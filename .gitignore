@@ -19,14 +19,6 @@ Thumbs.db
 # Logs
 *.log
 
-# Terraform
-terraform/.terraform/
-terraform/*.tfstate
-terraform/*.tfstate.*
-terraform/*.tfvars
-terraform/.terraform.lock.hcl
-terraform/crash.log
-
 # Environment
 .env
 .env.*.local
