@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
     environment {
         IMAGE_NAME = 'fit-track'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
@@ -15,7 +20,12 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'docker compose --profile tools run --rm maven mvn test -B'
+                sh 'mvn test -B'
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+                }
             }
         }
 
@@ -23,29 +33,25 @@ pipeline {
             steps {
                 script {
                     docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+                    sh "docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest"
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Placeholder: desplegar imagen ${IMAGE_NAME}:${IMAGE_TAG} al entorno objetivo'
-                // Ejemplo futuro:
-                // sh 'docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}'
-                // sh 'kubectl set image deployment/fit-track app=${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}'
+                echo "Placeholder Deploy: imagen ${IMAGE_NAME}:${IMAGE_TAG} lista localmente."
+                echo 'Siguiente paso del proyecto: Terraform (AWS) + push a registry + despliegue en EC2.'
             }
         }
     }
 
     post {
-        always {
-            cleanWs()
+        success {
+            echo "Pipeline OK. Imagen: ${IMAGE_NAME}:${IMAGE_TAG}"
         }
         failure {
-            echo 'Pipeline falló. Revisar logs de las etapas anteriores.'
-        }
-        success {
-            echo "Pipeline completado. Imagen: ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo 'Pipeline falló. Revisa los logs de Test o Build Image.'
         }
     }
 }

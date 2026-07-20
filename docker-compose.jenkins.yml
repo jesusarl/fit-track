@@ -1,0 +1,26 @@
+# Jenkins CI para FitTrack (independiente de la app local)
+# Uso: docker compose -f docker-compose.jenkins.yml up --build -d
+
+services:
+  jenkins:
+    build:
+      context: ./ci
+      dockerfile: Dockerfile.jenkins
+    container_name: fittrack-jenkins
+    ports:
+      - "${JENKINS_HOST_PORT:-8081}:8080"
+      - "50000:50000"
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=true"
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      # Permite construir imágenes con el Docker del host (Docker Desktop)
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    # En Linux, el grupo docker suele ser 999/1000; en Docker Desktop suele funcionar sin group_add
+    group_add:
+      - "0"
+
+volumes:
+  jenkins_home:
