@@ -103,6 +103,22 @@ docker exec fittrack-jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 
 Etapas: **Checkout → Test → Build Image → Deploy**
 
+### ¿Se dispara solo al hacer push?
+
+**Sí, con polling** (ya configurado en el `Jenkinsfile`):
+
+- Jenkins revisa GitHub aproximadamente **cada 2 minutos**.
+- Si hay commits nuevos en `main`, lanza el build **sin** pulsar Build Now.
+- La primera vez (o tras cambiar el `Jenkinsfile`), haz **un** Build Now manual para que Jenkins cargue el trigger.
+
+Flujo automático resultante:
+
+```text
+git push → (≤ ~2 min) Jenkins detecta cambios → Test → Build Image → Deploy Hook → Render
+```
+
+> Nota: un webhook instantáneo GitHub→Jenkins también es posible, pero necesita que Jenkins sea alcanzable desde internet (p. ej. ngrok). Con Jenkins en `localhost`, el polling es la opción práctica.
+
 ### Conectar Deploy de Jenkins → Render
 
 Objetivo: que solo se redeploye en Render **después** de que pasen los tests.

@@ -6,6 +6,13 @@ pipeline {
         disableConcurrentBuilds()
     }
 
+    // Dispara el pipeline automáticamente cuando detecta commits nuevos en GitHub.
+    // Poll cada ~2 minutos (adecuado para Jenkins local sin URL pública).
+    // Alternativa con webhook GitHub→Jenkins: requiere exponer Jenkins (ngrok/túnel).
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+
     environment {
         IMAGE_NAME = 'fit-track'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
