@@ -12,9 +12,10 @@ WORKDIR /app
 RUN apk add --no-cache curl
 COPY --from=build /app/target/fit-track-*.jar app.jar
 
+ENV PORT=8080
 EXPOSE 8080
 
 HEALTHCHECK --interval=15s --timeout=5s --retries=10 --start-period=40s \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:${PORT}/actuator/health || exit 1
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

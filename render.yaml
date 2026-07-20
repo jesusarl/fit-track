@@ -1,0 +1,43 @@
+# Blueprint de Render para FitTrack (app Docker + PostgreSQL)
+# Docs: https://render.com/docs/infrastructure-as-code
+
+databases:
+  - name: fittrack-db
+    plan: free
+    databaseName: fittrack
+    user: fittrack
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: fittrack-app
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: JAVA_TOOL_OPTIONS
+        value: "-XX:MaxRAMPercentage=75.0 -Xms128m"
+      - key: DB_HOST
+        fromDatabase:
+          name: fittrack-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: fittrack-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: fittrack-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: fittrack-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: fittrack-db
+          property: password
